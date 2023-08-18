@@ -1,3 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 sqlmodel
+alembic
+psycopg2 # somehow required by alembic
