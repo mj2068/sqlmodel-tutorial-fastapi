@@ -19,3 +19,9 @@ class HeroCreate(HeroBase):
 
 class HeroRead(HeroBase):
     id: int
+
+
+class HeroUpdate(SQLModel):
+    name: str | None
+    secret_name: str | None
+    age: int | None

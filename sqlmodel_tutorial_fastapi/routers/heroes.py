@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from sqlmodel import Session, select
 from sqlmodel_tutorial_fastapi.db import get_session
 
-from sqlmodel_tutorial_fastapi.models import Hero, HeroCreate, HeroRead
+from sqlmodel_tutorial_fastapi.models import Hero, HeroCreate, HeroRead, HeroUpdate
 
 
 router = APIRouter(prefix="/heroes")
@@ -44,3 +44,25 @@ def read_hero(
         )
 
     return hero
+
+
+@router.patch("/{id}", response_model=HeroRead)
+def update_hero(
+    id: Annotated[int, Path(description="id for the hero")],
+    hero: Annotated[HeroUpdate, Body()],
+    session: Session = Depends(get_session),
+):
+    hero_db = session.get(Hero, id)
+    if not hero_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"could not find hero with id: {id}.",
+        )
+
+    hero_up = hero.dict(exclude_unset=True)
+    for key, value in hero_up.items():
+        setattr(hero_db, key, value)
+    session.add(hero_db)
+    session.commit()
+    session.refresh(hero_db)
+    return hero_db
