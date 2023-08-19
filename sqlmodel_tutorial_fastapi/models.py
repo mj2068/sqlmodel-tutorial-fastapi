@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -56,3 +56,11 @@ class TeamRead(TeamBase):
 class TeamUpdate(SQLModel):
     name: str | None
     headquarters: str | None
+
+
+class HeroReadWithTeam(HeroRead):
+    team: TeamRead | None
+
+
+class TeamReadWithHeroes(TeamRead):
+    heroes: list[HeroRead]

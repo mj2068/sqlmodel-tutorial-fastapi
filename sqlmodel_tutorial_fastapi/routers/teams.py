@@ -3,7 +3,12 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 from sqlmodel import Session, select
 from sqlmodel_tutorial_fastapi.db import get_session
 
-from sqlmodel_tutorial_fastapi.models import Team, TeamCreate, TeamRead
+from sqlmodel_tutorial_fastapi.models import (
+    Team,
+    TeamCreate,
+    TeamRead,
+    TeamReadWithHeroes,
+)
 
 
 router = APIRouter(prefix="/teams")
@@ -26,7 +31,7 @@ def read_teams(session: Session = Depends(get_session)):
     return teams
 
 
-@router.get("/{id}", response_model=TeamRead)
+@router.get("/{id}", response_model=TeamReadWithHeroes)
 def read_team(id: Annotated[int, Path()], session: Session = Depends(get_session)):
     team = session.get(Team, id)
     if not team:
@@ -34,6 +39,7 @@ def read_team(id: Annotated[int, Path()], session: Session = Depends(get_session
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"could not find team with id {id}.",
         )
+    print(team.heroes)
     return team
 
 

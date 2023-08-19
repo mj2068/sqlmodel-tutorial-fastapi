@@ -3,7 +3,13 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from sqlmodel import Session, select
 from sqlmodel_tutorial_fastapi.db import get_session
 
-from sqlmodel_tutorial_fastapi.models import Hero, HeroCreate, HeroRead, HeroUpdate
+from sqlmodel_tutorial_fastapi.models import (
+    Hero,
+    HeroCreate,
+    HeroRead,
+    HeroReadWithTeam,
+    HeroUpdate,
+)
 
 
 router = APIRouter(prefix="/heroes")
@@ -31,7 +37,7 @@ def read_heroes(
     return heroes
 
 
-@router.get("/{id}", response_model=HeroRead)
+@router.get("/{id}", response_model=HeroReadWithTeam)
 def read_hero(
     id: Annotated[int, Path(description="id for the hero")],
     session: Session = Depends(get_session),
