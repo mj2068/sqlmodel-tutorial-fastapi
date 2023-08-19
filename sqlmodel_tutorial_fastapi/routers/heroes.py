@@ -66,3 +66,18 @@ def update_hero(
     session.commit()
     session.refresh(hero_db)
     return hero_db
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_hero(
+    id: Annotated[int, Path(description="id for the hero to delete")],
+    session: Session = Depends(get_session),
+):
+    hero = session.get(Hero, id)
+    if not hero:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"could not find hero with id: {id}.",
+        )
+    session.delete(hero)
+    session.commit()
