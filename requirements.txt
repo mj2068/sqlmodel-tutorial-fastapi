@@ -3,3 +3,8 @@ uvicorn[standard]
 sqlmodel
 alembic
 psycopg2 # somehow required by alembic
+
+# tests
+requests
+pytest
+httpx # required by pytest

@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     password: str
     address: str
     dbname: str
-
+    dbname_test:str
+    
     class Config:
         env_prefix = "db_"
         env_file = ".env"
