@@ -2,7 +2,6 @@ from fastapi import status
 from fastapi.testclient import TestClient
 import pytest
 from sqlmodel import SQLModel, Session, create_engine
-import sqlmodel
 
 from sqlmodel_tutorial_fastapi.models import Hero
 
@@ -62,7 +61,7 @@ def test_read_heroes_empyt(client: TestClient):
 
 def test_read_heroes(session: Session, client: TestClient):
     hero_1 = Hero(name="hero1", secret_name="fast")
-    hero_2 = Hero(name="her2", secret_name="hard", age=32)
+    hero_2 = Hero(name="her2", secret_name="hard", age=30)
     session.add(hero_1)
     session.add(hero_2)
     session.commit()
@@ -81,3 +80,44 @@ def test_read_heroes(session: Session, client: TestClient):
     assert data[1]["secret_name"] == hero_2.secret_name
     assert data[1]["age"] == hero_2.age
     assert data[1]["id"] == hero_2.id
+
+
+def test_read_hero(session: Session, client: TestClient):
+    zhizi = Hero(name="zhizi", secret_name="liuzhi")
+    session.add(zhizi)
+    session.commit()
+
+    rsp = client.get(f"/heroes/{zhizi.id}")
+    data = rsp.json()
+
+    assert rsp.status_code == status.HTTP_200_OK
+    assert data["name"] == zhizi.name
+    assert data["secret_name"] == zhizi.secret_name
+
+
+def test_update_hero(session: Session, client: TestClient):
+    zhizi = Hero(name="zhizi", secret_name="liuzhi")
+    session.add(zhizi)
+    session.commit()
+
+    rsp = client.patch(f"/heroes/{zhizi.id}", json={"age": 20, "secret_name": "li zhi"})
+    data = rsp.json()
+
+    updated_zhizi = session.get(Hero, zhizi.id)
+
+    assert rsp.status_code == status.HTTP_200_OK
+    assert data["id"] == zhizi.id
+    assert data["age"] is not None and data["age"] == 20
+    assert data["secret_name"] == updated_zhizi.secret_name
+
+
+def test_delete_hero(session: Session, client: TestClient):
+    zhizi = Hero(name="zhizi", secret_name="liuzhi")
+    session.add(zhizi)
+    session.commit()
+
+    rsp = client.delete(f"/heroes/{zhizi.id}")
+
+    assert rsp.status_code == status.HTTP_204_NO_CONTENT
+    zhizi_db = session.get(Hero, zhizi.id)
+    assert zhizi_db is None
